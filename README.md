@@ -1,6 +1,6 @@
 # JSON schema to Elm
 
-An elm package for generating Elm JSON decoders from JSON Schema. This is initially an attempt to port the https://github.com/dragonwasrobot/json-schema-to-elm project written in Elixer to Elm and publish as a package that can be used in Elm applications or perhaps as a CLI tool installed via NPM.
+An elm package for generating Elm JSON decoders from JSON Schema. The initial goals are to attempt to port the [dragonwasrobot/json-schema-to-elm](https://github.com/dragonwasrobot/json-schema-to-elm) project written in Elixir to Elm and publish as a package that can be used in Elm applications or perhaps as a CLI tool installed via NPM.
 
 ## Contributions
 
