@@ -1,0 +1,13 @@
+{
+    "version": "0.1.0",
+    "tasks": [
+        {
+        "taskName": "elm-test",
+        "command": "elm-test",
+        "isTestCommand": true,
+        "isShellCommand": true,
+        "args": [],
+        "showOutput": "always"
+        }    
+    ]
+}

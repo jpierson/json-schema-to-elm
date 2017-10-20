@@ -1,0 +1,8 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "elm.makeCommand": "elm make",
+    "search.exclude": {
+        "**/.elm-analyse": true,
+        "**/elm-stuff": true
+    }
+}
