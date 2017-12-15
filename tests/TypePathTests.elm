@@ -17,8 +17,8 @@ suite =
                     Expect.equal (fromString "#") [ "#" ]
             , test """TypePath.fromString("#/definitions/foo")""" <|
                 \() ->
-                    Expect.equal 
-                        (fromString "#/definitions/foo") 
+                    Expect.equal
+                        (fromString "#/definitions/foo")
                         [ "#", "definitions", "foo" ]
             , test """TypePath.toString([])""" <|
                 \() ->
@@ -28,8 +28,8 @@ suite =
                     Expect.equal (TypePath.toString [ "#" ]) "#"
             , test """TypePath.toString(["#", "definitions", "foo"])""" <|
                 \() ->
-                    Expect.equal 
-                        (TypePath.toString [ "#", "definitions", "foo" ]) 
+                    Expect.equal
+                        (TypePath.toString [ "#", "definitions", "foo" ])
                         "#/definitions/foo"
             , test """TypePath.addChild(["#", "definitions", "foo"], "")""" <|
                 \() ->
