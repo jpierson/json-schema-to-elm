@@ -1,4 +1,4 @@
-module Example exposing (..)
+module TypePathTests exposing (..)
 
 import Expect
 import Test exposing (..)
@@ -7,8 +7,8 @@ import TypePath exposing (..)
 
 suite : Test
 suite =
-    describe "parse primitive all_of type"
-        [ describe "TypePath"
+    describe "TypePath"
+        [ describe "Converts a json schema path like \"#/definitions/foo\" into its corresponding `JS2E.TypePath`"
             [ test """TypePath.fromString("")""" <|
                 \() ->
                     Expect.equal (fromString "") []
