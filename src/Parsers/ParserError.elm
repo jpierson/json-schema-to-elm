@@ -21,6 +21,7 @@ import Types exposing (..)
 type ErrorTypes
     = Unsupported_schema_version
     | Missing_property
+    | Name_collision
 
 
 type alias ParserError =

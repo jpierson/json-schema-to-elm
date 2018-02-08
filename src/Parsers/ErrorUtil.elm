@@ -62,7 +62,7 @@ unsupported_schema_version supplied_value supported_versions =
         <http://json-schema.org/latest/json-schema-core.html#rfc.section.7>
         """
     in
-        ParserError.new root_path Unsupported_schema_version error_msg
+        Parsers.ParserError.new root_path Unsupported_schema_version error_msg
 
 
 missing_property : Types.TypeIdentifier -> String -> ParserError
@@ -76,13 +76,13 @@ missing_property identifier property =
         Could not find property '""" ++ property ++ """' at '""" ++ full_identifier ++ """'
         """
     in
-        ParserError.new identifier Missing_property error_msg
+        Parsers.ParserError.new identifier Missing_property error_msg
 
 
 printIdentifier : TypeIdentifier -> String
 printIdentifier identifier =
     case identifier of
-        TypePath ->
+        TypePath->
             TypePath.toString (identifier)
 
         String ->
@@ -92,16 +92,22 @@ printIdentifier identifier =
             identifier
 
         _ ->
-            toString (identifier)
+            Basics.toString (identifier)
 
 
 nameCollision : TypeIdentifier -> ParserError
 nameCollision identifier =
+    let
+        full_identifier = print_identifier identifier
+        error_msg = """
+            Found more than one property with identifier '#{"""++  full_identifier  ++"""}'
+            """
+    in
     printIdentifier identifier
         |> Debug.log """
             Found more than one property with identifier '#{full_identifier}'
             """ printIdentifier identifier
-        > ParserError.new ( identifier, name_collision, error_msg )
+        > Parsers.ParserError.new identifier Name_collision error_msg
 
 
 invalidUri : Types.TypeIdentifier -> String -> String -> ParserError
@@ -114,10 +120,10 @@ invalidUri identifier property actual =
             sanitize_value actual
     in
         """
-        Could not parse property '""" ++ property ++ """' at '""" ++ full_identifier ++ """' into a valid URI.
+        Could not parse property '""" ++ property ++ """' at '""" ++ fullIdentifier ++ """' into a valid URI.
 
-            "id": """ ++ stringified_value ++ """
-                """ ++ error_markings (stringified_value) ++ """
+            "id": """ ++ stringifiedValue ++ """
+                """ ++ error_markings (stringifiedValue) ++ """
 
         Hint: See URI specification section 3. "Syntax Components"
         <https://tools.ietf.org/html/rfc3986#section-3>

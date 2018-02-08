@@ -56,4 +56,5 @@ merge result1 result2 =
     in
         collisions
 
+
 -- TODO: Left off here implementing merge
