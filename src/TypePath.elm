@@ -31,8 +31,8 @@ addChild segments segment =
             List.append segments [ segment ]
 
 
-type_path : List String -> Bool
-type_path path =
+isTypePath : List String -> Bool
+isTypePath path =
     -- path |> List.length |> (>) 0 && (List.head path) |> Maybe.map (\segment -> segment == "#") |> Maybe.withDefault (False)
     List.head path
         |> Maybe.map (\segment -> segment == "#")

@@ -9,6 +9,7 @@ import Parsers.ParserError exposing (..)
 -- HACK: The original Elixir implementation did some dynamc type checking here, probably not applicable in elm
 
 
+
 sanitize_value : a -> String
 sanitize_value =
     Basics.toString
@@ -20,9 +21,20 @@ error_markings value =
         |> red
 
 
-red : String -> a
+
+
+red : a -> a
 red value =
-    Logger.Error value
+    let 
+        loggerConfig : Logger.Config a
+        loggerConfig =
+            Logger.defaultConfig Logger.Error
+
+        log : String -> a -> a
+        log =
+            Logger.log loggerConfig Logger.Error
+    in
+        Logger.log loggerConfig Logger.Error "error" value
 
 
 inspect : a -> String
@@ -32,10 +44,13 @@ inspect =
 
 print_identifier : Types.TypeIdentifier -> String
 print_identifier identifier =
-    if TypePath.type_path identifier then
-        TypePath.toString identifier
-    else
-        Basics.toString identifier
+    case identifier of
+        Types.TypePath identifier ->
+            TypePath.toString identifier
+        Types.String string ->
+            string
+        Types.Uri uri ->
+            Basics.toString uri
 
 
 unsupported_schema_version : String -> List String -> ParserError
@@ -62,7 +77,7 @@ unsupported_schema_version supplied_value supported_versions =
         <http://json-schema.org/latest/json-schema-core.html#rfc.section.7>
         """
     in
-        Parsers.ParserError.new root_path Unsupported_schema_version error_msg
+        Parsers.ParserError.new (Types.TypePath root_path) Unsupported_schema_version error_msg
 
 
 missing_property : Types.TypeIdentifier -> String -> ParserError
@@ -82,18 +97,14 @@ missing_property identifier property =
 printIdentifier : TypeIdentifier -> String
 printIdentifier identifier =
     case identifier of
-        TypePath->
-            TypePath.toString (identifier)
+        Types.TypePath typePath ->
+            TypePath.toString typePath
 
-        String ->
-            identifier
+        Types.String string ->
+            string
 
-        Uri ->
-            identifier
-
-        _ ->
-            Basics.toString (identifier)
-
+        Types.Uri uri ->
+            uri
 
 nameCollision : TypeIdentifier -> ParserError
 nameCollision identifier =
@@ -103,28 +114,26 @@ nameCollision identifier =
             Found more than one property with identifier '#{"""++  full_identifier  ++"""}'
             """
     in
-    printIdentifier identifier
-        |> Debug.log """
-            Found more than one property with identifier '#{full_identifier}'
-            """ printIdentifier identifier
-        > Parsers.ParserError.new identifier Name_collision error_msg
-
+        Parsers.ParserError.new identifier Name_collision error_msg
 
 invalidUri : Types.TypeIdentifier -> String -> String -> ParserError
 invalidUri identifier property actual =
     let
         fullIdentifier =
-            print_identifier invalidUri
+            print_identifier identifier
 
         stringifiedValue =
             sanitize_value actual
+
+        error_msg =
+            """
+            Could not parse property '""" ++ property ++ """' at '""" ++ fullIdentifier ++ """' into a valid URI.
+
+                "id": """ ++ stringifiedValue ++ """
+                    """ ++ error_markings (stringifiedValue) ++ """
+
+            Hint: See URI specification section 3. "Syntax Components"
+            <https://tools.ietf.org/html/rfc3986#section-3>
+            """
     in
-        """
-        Could not parse property '""" ++ property ++ """' at '""" ++ fullIdentifier ++ """' into a valid URI.
-
-            "id": """ ++ stringifiedValue ++ """
-                """ ++ error_markings (stringifiedValue) ++ """
-
-        Hint: See URI specification section 3. "Syntax Components"
-        <https://tools.ietf.org/html/rfc3986#section-3>
-        """
+        Parsers.ParserError.new identifier Invalid_uri error_msg

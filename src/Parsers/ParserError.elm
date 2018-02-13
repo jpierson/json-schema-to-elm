@@ -22,6 +22,7 @@ type ErrorTypes
     = Unsupported_schema_version
     | Missing_property
     | Name_collision
+    | Invalid_uri
 
 
 type alias ParserError =

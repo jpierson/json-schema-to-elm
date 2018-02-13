@@ -26,9 +26,9 @@ type alias Path =
 type SchemaNode = Dict
 
 type TypeIdentifier
-    = String
-    | TypePath
-    | Uri
+    = String String
+    | TypePath TypePath
+    | Uri Uri
 
 
 type alias PropertyDictionary =
