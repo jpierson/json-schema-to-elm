@@ -21,3 +21,17 @@ new identifier warning_type message =
     , warning_type = warning_type
     , message = message
     }
+
+
+
+-- HACK: provide ability to compare two ParserWarning records
+
+
+isEqual : ParserWarning -> ParserWarning -> Bool
+isEqual warning1 warning2 =
+    warning1.warning_type
+        == warning2.warning_type
+        && warning1.identifier
+        == warning2.identifier
+        && warning1.message
+        == warning2.message

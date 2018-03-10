@@ -38,3 +38,17 @@ new identifier error_type message =
     , error_type = error_type
     , message = message
     }
+
+
+
+-- HACK: provide ability to compare two ParserWarning records
+
+
+isEqual : ParserError -> ParserError -> Bool
+isEqual error1 error2 =
+    error1.error_type
+        == error2.error_type
+        && error1.identifier
+        == error2.identifier
+        && error1.message
+        == error2.message

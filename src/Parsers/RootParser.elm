@@ -139,7 +139,10 @@ parseSchema root_node schema_file_path =
 
 parse_definitions : SchemaNode -> URI -> ParserResult
 parse_definitions schema_root_node schema_id =
-    if DefinitionsParser.type
+    if DefinitionsParser.type schema_root_node
+        DefinitionsParser.parse schema_root_node schema_id Nothing ["#"] "" 
+    else
+        ParserResult.new
     -- TODO: Left off here
 
 {-
