@@ -9,7 +9,6 @@ import Parsers.ParserError exposing (..)
 -- HACK: The original Elixir implementation did some dynamc type checking here, probably not applicable in elm
 
 
-
 sanitize_value : a -> String
 sanitize_value =
     Basics.toString
@@ -21,11 +20,9 @@ error_markings value =
         |> red
 
 
-
-
 red : a -> a
 red value =
-    let 
+    let
         loggerConfig : Logger.Config a
         loggerConfig =
             Logger.defaultConfig Logger.Error
@@ -47,8 +44,10 @@ print_identifier identifier =
     case identifier of
         Types.TypePath identifier ->
             TypePath.toString identifier
+
         Types.String string ->
             string
+
         Types.Uri uri ->
             Basics.toString uri
 
@@ -64,12 +63,12 @@ unsupported_schema_version supplied_value supported_versions =
 
         error_msg =
             """
-        Unsupported JSON schema version found at '#'.
+            Unsupported JSON schema version found at '#'.
 
-            "$schema": """ ++ stringified_value ++ """
-                    """ ++ (error_markings stringified_value) ++ """
+                "$schema": """ ++ stringified_value ++ """
+                        """ ++ (error_markings stringified_value) ++ """
 
-        Was expecting one of the following types:
+            Was expecting one of the following types:
 
             """ ++ (inspect supported_versions) ++ """
 
@@ -88,8 +87,8 @@ missing_property identifier property =
 
         error_msg =
             """
-        Could not find property '""" ++ property ++ """' at '""" ++ full_identifier ++ """'
-        """
+            Could not find property '""" ++ property ++ """' at '""" ++ full_identifier ++ """'
+            """
     in
         Parsers.ParserError.new identifier Missing_property error_msg
 
@@ -106,15 +105,20 @@ printIdentifier identifier =
         Types.Uri uri ->
             uri
 
+
 nameCollision : TypeIdentifier -> ParserError
 nameCollision identifier =
     let
-        full_identifier = print_identifier identifier
-        error_msg = """
-            Found more than one property with identifier '#{"""++  full_identifier  ++"""}'
+        full_identifier =
+            print_identifier identifier
+
+        error_msg =
+            """
+            Found more than one property with identifier '#{""" ++ full_identifier ++ """}'
             """
     in
         Parsers.ParserError.new identifier Name_collision error_msg
+
 
 invalidUri : Types.TypeIdentifier -> String -> String -> ParserError
 invalidUri identifier property actual =

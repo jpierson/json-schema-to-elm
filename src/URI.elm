@@ -19,6 +19,7 @@ type alias URI =
     , uriPort : Maybe Int
     }
 
+
 empty : URI
 empty =
     { scheme = Nothing
@@ -30,6 +31,7 @@ empty =
     , host = Nothing
     , uriPort = Nothing
     }
+
 
 parseUriRegex : Regex
 parseUriRegex =

@@ -5,6 +5,6 @@ import TypePath exposing (..)
 
 type alias TupleType =
     { name : String
-    , path : TypePath.T
-    , items : TypePath.T
+    , path : TypePath.TypePath
+    , items : TypePath.TypePath
     }

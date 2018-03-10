@@ -3,15 +3,18 @@ module Poison exposing (..)
 import Dict exposing (..)
 import Json.Decode exposing (..)
 
-type PoisonNode =
-    NameValuePair (String, String)
+
+type PoisonNode
+    = NameValuePair ( String, String )
+
 
 decode : String -> Dict String Value
-decode json = 
+decode json =
     decodeString (dict value) json
-        |> \ result ->
+        |> \result ->
             case result of
-                Ok value -> value
-                Err error -> Dict.empty
+                Ok value ->
+                    value
 
-    
+                Err error ->
+                    Dict.empty

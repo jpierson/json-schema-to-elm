@@ -2,9 +2,11 @@ module Types.EnumType exposing (..)
 
 import TypePath exposing (..)
 
+
 type StringOrNumber
     = String
     | Number
+
 
 type alias EnumType =
     { name : String

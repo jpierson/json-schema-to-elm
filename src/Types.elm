@@ -23,7 +23,9 @@ type alias Path =
 -- TypeDefinition moved to it's own module to avoid cyclical dependency
 
 
-type SchemaNode = Dict
+type SchemaNode
+    = Dict
+
 
 type TypeIdentifier
     = String String
