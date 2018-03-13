@@ -7,6 +7,7 @@ import Types.TypeDefinition exposing (..)
 import Parsers.ParserWarning exposing (..)
 import Parsers.ParserError exposing (..)
 import Parsers.ErrorUtil exposing (nameCollision)
+import ListExtras exposing (uniq)
 
 
 type alias ParserResult =
@@ -39,9 +40,9 @@ new =
     }
 
 
-uniq : (a -> a -> bool) -> List a -> List a
-uniq comparer list =
-    list
+-- uniq : (a -> a -> bool) -> List a -> List a
+-- uniq comparer list =
+--     list
 
 
 merge : ParserResult -> ParserResult -> ParserResult
@@ -66,7 +67,8 @@ merge result1 result2 =
             in
                 intersection
                     -- TODO: Get the following data constructor to work for Types.TypeIdentifier.String
-                    |> List.map (\key -> (Types.String) key)
+                    -- |> List.map (\key -> (Types.String) key)
+                    |> List.map Types.String
                     -- |> List.map Types.TypeIdentifier.String
                     |> List.map nameCollision
 

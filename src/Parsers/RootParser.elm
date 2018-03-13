@@ -6,28 +6,28 @@ import Dict exposing (..)
 import Parsers.Util exposing (..)
 
 -- import Parsers.ArrayParser exposing (..)
--- import Parsers.DefinitionsParser exposing (..)
+import Parsers.DefinitionsParser exposing (..)
 -- import Parsers.ObjectParser exposing (..)
 -- import Parsers.TupleParser exposing (..)
 -- import Parsers.TypeReferenceParser exposing (..)
 
-import Parsers.ErrorUtil exposing (..)
+import Parsers.ErrorUtil as ErrorUtil
 import Parsers.ParserResult exposing (..)
 import Parsers.ParserError exposing (..)
 import Parsers.SchemaResult exposing (..)
 
 import Types exposing (SchemaNode)
+import TypePath exposing (..)
 
-import URI exposing (parse, to_string)
+import URI exposing (URI, parse, to_string)
 
 type ParseNode = 
     SchemaNode Types.SchemaNode 
     Dict String Value
 
 type ParseOutput = 
-    -- SchemaNode Types.SchemaNode 
-    | Ok String 
-    | Error ParseError
+    Ok String 
+    | Error ParserError
 
 isBinary : Value
 isBinary value = 
@@ -38,25 +38,28 @@ isBinary value =
 supported_versions = 
     [ "http://json-schema.org/draft-04/schema" ]
 
-valid_uri_schemes = ["http", "https", "urn"]
+validUriSchemes = ["http", "https", "urn"]
 
 parseSchemaVersion : Types.SchemaNode -> ParseOutput
 parseSchemaVersion node =
     -- case Dict.get "$schema" |> Maybe.map (isBinary) of 
     case Dict.get "$schema" node of 
         Just schema_str -> 
-            case schema_str 
+            schema_str 
                 |> URI.parse 
                 |> URI.to_string 
-                |> (List.any ((=) schema)  supported_versions) of -- original code parsed schema as URL here and then turned back to string, for normalization?
-                True -> Result.Ok schema_str
-                False -> Result.Err <| ErrorUtil.unsupported_schema_version schema_str supported_versions
+                |> case (List.any (\ schema -> (==) schema) supported_versions) of -- original code parsed schema as URL here and then turned back to string, for normalization?
+                    True -> Result.Ok schema_str
+                    False -> Result.Err <| (ErrorUtil.unsupported_schema_version schema_str supported_versions)
             
         -- TODO: If we allow dynamic type checking then we can construct invalid_type error
         -- ErrorUtil.invalid_type("#", "$schema", "string", schema_type)
 
         Nothing ->
-            Result.Err <| ErrorUtil.invalid_property path "$schema"
+            let
+                path = TypePath.fromString "#"
+            in
+                Result.Err <| ErrorUtil.missing_property path "$schema"
 
 
 parseSchemaId : Types.SchemaNode -> Result URI ParserError
@@ -68,7 +71,7 @@ parseSchemaId schemaNode =
             --     Just parsedId -> 
                     case List.member parsedId.schema validUriSchemes of
                         True ->
-                            Result.Ok parseId
+                            Result.Ok parsedId
                         
                         False ->
                             -- URI not found in list
@@ -137,13 +140,13 @@ parseSchema root_node schema_file_path =
   end
 -}
 
-parse_definitions : SchemaNode -> URI -> ParserResult
+parse_definitions : SchemaNode -> URI.URI -> ParserResult
 parse_definitions schema_root_node schema_id =
-    if DefinitionsParser.type schema_root_node
+    if DefinitionsParser.isType schema_root_node
         DefinitionsParser.parse schema_root_node schema_id Nothing ["#"] "" 
+
     else
         ParserResult.new
-    -- TODO: Left off here
 
 {-
   @spec parse_definitions(Types.schemaNode, URI.t) :: ParserResult.t

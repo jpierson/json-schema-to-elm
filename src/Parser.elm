@@ -6,16 +6,15 @@ module Parser exposing (parseSchemaFiles)
 
 import Debug exposing (log)
 import Types exposing (..)
-import Parsers exposing (RootParser, SchemaResult, ErrorUtil)
--- import Parsers.RootParser exposing (..)
--- import Parsers.SchemaResult exposing (..)
--- import Parsers.ErrorUtil exposing (..)
+import Parsers.RootParser exposing (..)
+import Parsers.SchemaResult exposing (..)
+import Parsers.ErrorUtil exposing (..)
 import Printers.Util
 import File
 
 
-parse_schema_files : [Path] -> SchemaResult
-parse_schema_files schemaPaths =
+parseSchemaFiles : [Path] -> SchemaResult
+parseSchemaFiles schemaPaths =
     let init_schema_result = SchemaResult.new()
 
     in schemaPaths
