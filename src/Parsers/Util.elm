@@ -1,16 +1,33 @@
 module Parsers.Util exposing (..)
 
+import Dict exposing (..)
 import Types exposing (..)
 import Types.TypeDefinition exposing (..)
 import TypePath exposing (..)
 import URI exposing (..)
 import Parsers.ParserResult exposing (..)
+import Parsers.ErrorUtil exposing (..)
 
 
-create_type_dict : TypeDefinition -> TypePath -> Maybe URI
-create_type_dict a b =
-    Nothing
-
+create_type_dict : TypeDefinition -> TypePath -> Maybe URI -> TypeDictionary
+create_type_dict type_def path id =
+    let
+        string_path = path |> TypePath.toString
+    in 
+        case id of 
+            Just id -> 
+                let 
+                    string_id = (if type_def.name == "#" then id ++ "#" else id)
+                in
+                    Dict.fromList 
+                        [ (string_path, type_def)
+                        , (string_id, type_def)
+                        ]
+            Nothing -> 
+                    Dict.fromList 
+                        [ (string_path, type_def)
+                        ]
+        
 
 parse_type : SchemaNode -> URI.URI -> TypePath.TypePath -> ParserResult
 parse_type schema_node parent_id path name =
@@ -42,9 +59,35 @@ parse_type schema_node parent_id path name =
 -- end
 -- end]
 
-determine_node_parser : SchemaNode -> TypeIdentifier -> String
+determine_node_parser : SchemaNode -> TypeIdentifier -> String -> Result nodeParser ParserError
 determine_node_parser schema_node identifier name = 
+    let
+        predicate_node_type_pairs = 
+        [ (AllOfParser.isType, AllOfParser.parse)
+        , (AnyOfParser.isType, AnyOfParser.parse)
+        , (ArrayParser.isType, ArrayParser.parse)
+        , (DefinitionsParser.isType, DefinitionsParser.parse)
+        , (EnumParser.isType, EnumParser.parse)
+        , (ObjectParser.isType, ObjectParser.parse)
+        , (OneOfParser.isType, OneOfParser.parse)
+        , (PrimitiveParser.isType, PrimitiveParser.parse)
+        , (TupleParser.isType, TupleParser.parse)
+        , (TypeReferenceParser.isType, TypeReferenceParser.parse)
+        , (UnionParser.isType, UnionParser.parse)
+        ]    
 
+
+        node_parser =
+            predicate_node_type_pairs
+                |> List.filter (\ pred _node_parser -> pred schema_node)
+                |> List.head
+                -- |> Maybe.withDefault Result.Error ErrorUtil.unknown_node_type(identifier, name, schema_node)
+                |> \ firstMatch -> 
+                    case firstMatch of 
+                        Maybe.Nothing -> Result.Error (ErrorUtil.unknown_node_type identifier name schema_node)
+                        Maybe.Just node_parser ->  Result.Ok node_parser
+    in
+        node_parser
 -- TODO : left off here
 
 --  @spec determine_node_parser(
@@ -79,4 +122,39 @@ determine_node_parser schema_node identifier name =
 --     else
 --       {:error, ErrorUtil.unknown_node_type(identifier, name, schema_node)}
 --     end
+--   end
+
+
+parse_child_types : List SchemaNode -> URI -> TypePath -> ParserResult
+parse_child_types child_nodes parent_id path =
+    case child_nodes of
+        List child_nodes ->
+            child_nodes
+            |> List.foldl (ParserResult.new, 0) (\ child_node (result, idx) -> 
+                let
+                    child_name = toString idx
+                    child_result = parse_type child_node parent_id path child_name
+                    
+                in
+                    (ParserResult.merge result child_result, idx + 1)
+                    )
+            |> Tuple.first
+        _ -> ParserResult.new -- HACK: Not sure what Elixir does here
+
+--   @doc ~S"""
+--   Parse a list of JSON schema objects that have a child relation to another
+--   schema object with the specified `parent_id`.
+--   """
+--   @spec parse_child_types([Types.schemaNode], URI.t, TypePath.t)
+--   :: ParserResult.t
+--   def parse_child_types(child_nodes, parent_id, path)
+--   when is_list(child_nodes) do
+
+--     child_nodes
+--     |> Enum.reduce({ParserResult.new(), 0}, fn (child_node, {result, idx}) ->
+--       child_name = to_string(idx)
+--       child_result = parse_type(child_node, parent_id, path, child_name)
+--       {ParserResult.merge(result, child_result), idx + 1}
+--     end)
+--     |> elem(0)
 --   end

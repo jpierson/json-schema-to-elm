@@ -8,6 +8,16 @@
         "isShellCommand": true,
         "args": [],
         "showOutput": "always"
-        }    
-    ]
+        },
+        {
+            "taskName": "elm-make",
+            "command": "elm-make",
+            "isTestCommand": false,
+            "isShellCommand": true,
+            "isBuildCommand": true,
+            "args": [],
+            "showOutput": "always"
+        }
+    ],
+    
 }
