@@ -1,4 +1,4 @@
-module URI exposing (URI, parse, to_string)
+module URI exposing (URI, parse, to_string, merge)
 
 import Regex exposing (..)
 import Array exposing (..)
@@ -86,3 +86,13 @@ to_string value =
 
         _ ->
             ""
+
+{--
+Merges two URIs.
+
+This function merges two URIs as per [RFC 3986, section 5.2.](https://hexdocs.pm/elixir/URI.html#merge/2)
+--}
+merge : URI -> URI -> URI
+merge uri rel =
+    -- TODO: This looks quite involved, perhaps we should use a library implementation instead of reimplementing URI merge
+    Debug.crash ""
