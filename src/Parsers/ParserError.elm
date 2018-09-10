@@ -23,6 +23,7 @@ type ErrorTypes
     | Missing_property
     | Name_collision
     | Invalid_uri
+    | Unknown_node_type
 
 
 type alias ParserError =

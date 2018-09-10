@@ -1,5 +1,6 @@
 module Parsers.ErrorUtil exposing (..)
 
+import Dict
 import Logger
 import Types exposing (TypeIdentifier)
 import TypePath exposing (..)
@@ -137,7 +138,43 @@ invalidUri identifier property actual =
                     """ ++ error_markings (stringifiedValue) ++ """
 
             Hint: See URI specification section 3. "Syntax Components"
-            <https://tools.ietf.org/html/rfc3986#section-3>
+            <https://t  ools.ietf.org/html/rfc3986#section-3>
             """
     in
         Parsers.ParserError.new identifier Invalid_uri error_msg
+
+
+
+-- SchemaNode is a Dict, but usage in the Elixir project appears to be the shape
+-- of something like `Dict String String` or `Dict String (List String)`
+
+
+unknown_node_type : Types.TypeIdentifier -> String -> Dict.Dict String String -> ParserError
+unknown_node_type identifier name schemaNode =
+    let
+        fullIdentifier =
+            identifier
+                |> print_identifier
+                -- HACK: the Elixir typings here were pretty strange, basically name just needed to be appended
+                |> (++) "/"
+                |> (++) name
+
+        stringifiedValue =
+            sanitize_value (Dict.get "type" schemaNode)
+
+        error_msg =
+            """
+            The value of "type" at '""" ++ fullIdentifier ++ """' did not match a known node type
+
+                "type": """ ++ stringifiedValue ++ """
+                        """ ++ error_markings (stringifiedValue) ++ """
+
+            Was expecting one of the following types
+
+                ["null", "boolean", "object", "array", "number", "integer", "string"]
+
+            Hint: See the specification section 6.25. "Validation keywords - type"
+            <http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25>
+            """
+    in
+        Parsers.ParserError.new identifier Unknown_node_type error_msg
