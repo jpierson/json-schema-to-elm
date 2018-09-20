@@ -9,10 +9,11 @@ import Parsers.ParserResult exposing (..)
 import Parsers.ErrorUtil exposing (..)
 import Parsers.ParserError exposing (..)
 
+import Parsers.AcyclicUtil exposing (ParserUtil)
+
 import Parsers.AllOfParser exposing (..)
-import Parsers.AllOfParser exposing (..)
--- TODO: LEFT OFF HERE
 -- import Parsers.AnyOfParser exposing (..)
+-- TODO: LEFT OFF HERE
 -- import Parsers.ArrayParser exposing (..)
 -- import Parsers.DefinitionsParser exposing (..)
 -- import Parsers.EnumParser exposing (..)
@@ -42,6 +43,34 @@ create_type_dict type_def path id =
                         [ (string_path, type_def)
                         ]
         
+
+-- @doc ~S"""
+--   Returns a list of type paths when given a type dictionary.
+--   """
+create_types_list : TypeDictionary -> TypePath.TypePath -> TypePath.TypePath
+create_types_list type_dict path = 
+    type_dict
+    |> Dict.foldr /entry reference_dict -> 
+        let
+            child_type_path = TypePath.add_child path child_type.name
+        in
+
+--   @spec create_types_list(Types.typeDictionary, TypePath.t) :: [TypePath.t]
+--   def create_types_list(type_dict, path) do
+--     type_dict
+--     |> Enum.reduce(%{}, fn({child_abs_path, child_type}, reference_dict) ->
+
+--       child_type_path = TypePath.add_child(path, child_type.name)
+
+--       if child_type_path == TypePath.from_string(child_abs_path) do
+--         Map.merge(reference_dict, %{child_type.name => child_type_path})
+--       else
+--         reference_dict
+--       end
+
+--     end)
+--     |> Map.values()
+--   end
 
 parse_type : SchemaNode -> URI.URI -> TypePath.TypePath -> ParserResult
 parse_type schema_node parent_id path name =
@@ -76,7 +105,7 @@ parse_type schema_node parent_id path name =
 determine_node_parser : SchemaNode -> TypeIdentifier -> String -> Result nodeParser ParserError
 determine_node_parser schema_node identifier name = 
     let
-        predicate_node_type_pairs = 
+        predicate_node_type_pairs = S
         [ (AllOfParser.isType, AllOfParser.parse)
         , (AnyOfParser.isType, AnyOfParser.parse)
         , (ArrayParser.isType, ArrayParser.parse)

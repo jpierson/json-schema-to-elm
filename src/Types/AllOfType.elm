@@ -8,3 +8,8 @@ type alias AllOfType =
     , path : TypePath
     , types : List TypePath
     }
+
+new : String -> TypePath -> List TypePath -> AllOfType
+new name path types =
+    AllOfType name path types
+    -- { name = name, path = path, types = types }

@@ -6,7 +6,8 @@
     "source-directories": [
         ".",
         "..",
-        "../src"
+        "../src",
+        "Parsers"
     ],
     "exposed-modules": [],
     "native-modules": true,
@@ -14,7 +15,8 @@
         "eeue56/elm-html-test": "5.1.1 <= v < 6.0.0",
         "elm-community/elm-test": "4.0.0 <= v < 5.0.0",
         "elm-lang/core": "5.1.1 <= v < 6.0.0",
-        "elm-lang/html": "2.0.0 <= v < 3.0.0"
+        "elm-lang/html": "2.0.0 <= v < 3.0.0",
+        "iosphere/elm-logger": "1.0.1 <= v < 2.0.0"
     },
     "elm-version": "0.18.0 <= v < 0.19.0"
 }
