@@ -4,5 +4,6 @@
     "search.exclude": {
         "**/.elm-analyse": true,
         "**/elm-stuff": true
-    }
+    },
+    "elm.analyseEnabled": true
 }

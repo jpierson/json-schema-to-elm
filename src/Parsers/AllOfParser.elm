@@ -6,6 +6,7 @@ import TypePath exposing (..)
 import URI exposing (..)
 import Parsers.ParserResult exposing (..)
 import Types.AllOfType exposing (..)
+import Types.TypeDefinition exposing (..)
 import Types exposing (..)
 -- import Parsers.AcyclicUtil exposing (parse_child_types, create_types_list, create_type_dict)
 import Parsers.AcyclicUtil exposing (ParserUtil)
@@ -49,47 +50,38 @@ isType node =
 --         Nothing -> 
 --             Parsers.ParserResult.new
 
+apply : a -> b -> (a -> b -> c) -> c
+apply a b f = f a b
 
+parse : ParserUtil -> Node -> URI -> Maybe URI -> TypePath -> String -> ParserResult
+parse util nodeValue parent_id id path name =
+    case Dict.get "allOf" nodeValue of
+        Just all_of -> 
+            case all_of of 
+                Branch all_of ->
+                    let 
+                        child_path = TypePath.addChild path "allOf"
 
--- parse : ParserUtil -> Node -> URI -> Maybe URI -> TypePath -> String -> ParserResult
--- parse util nodeValue parent_id id path name =
---     let 
---         handleNodeValue: NodeValue -> ParserResult
---         handleNodeValue nodeValue = 
---             case nodeValue of
---                 ListNode list -> Parsers.ParserResult.new
-                      
---                 _ -> Parsers.ParserResult.new -- HACK: Not sure what Elixir does here
---     in
---         case Dict.get "allOf" nodeValue of
---             Just all_of -> 
---                 handleNodeValue all_of
---                 -- case all_of of
---                 --     -- NodeValue -> 
---                 --     -- case all_of of 
---                 --     ListNode (all_of) ->
---                 --         Parsers.ParserResult.new
---                 --         -- let 
---                 --         --     child_path = TypePath.addChild path "allOf"
+                        child_types_result : ParserResult
+                        child_types_result = 
+                            util.parse_child_types (Dict.values all_of) parent_id child_path
+                        
+                        all_of_types : List TypePath.TypePath
+                        all_of_types = 
+                            util.create_types_list (child_types_result.type_dict) child_path
 
---                 --         --     child_types_result = 
---                 --         --         all_of
---                 --         --         |> util.parse_child_types parent_id child_path
-                            
---                 --         --     all_of_types =
---                 --         --         child_types_result.type_dict
---                 --         --         |> util.create_types_list child_path
+                        all_of_type : Types.AllOfType.AllOfType
+                        all_of_type = Types.AllOfType.new name path all_of_types
 
---                 --         --     all_of_type = Types.AllOfType.new name path all_of_types
+                    in
+                        Types.TypeDefinition.AllOfType all_of_type
+                        |> (util.create_type_dict)
+                        |> apply path id
+                        |> Parsers.ParserResult.newWithTypeDictionary
+                        |> Parsers.ParserResult.merge child_types_result
 
---                 --         -- in
---                 --         --     all_of_type 
---                 --         --     |> util.create_type_dict path id
---                 --         --     |> Parsers.ParserResult.new
---                 --         --     |> Parsers.ParserResult.merge child_types_result
-
---                 --     _ -> Parsers.ParserResult.new -- HACK: Not sure what Elixir does here
---             Nothing -> Parsers.ParserResult.new -- HACK: Not sure what Elixir does here
+                _ -> Parsers.ParserResult.new -- HACK: Not sure what Elixir does here
+        Nothing -> Parsers.ParserResult.new -- HACK: Not sure what Elixir does here
 
 
 --   @impl JS2E.Parsers.ParserBehaviour

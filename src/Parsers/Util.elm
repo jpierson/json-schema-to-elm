@@ -47,14 +47,18 @@ create_type_dict type_def path id =
 -- @doc ~S"""
 --   Returns a list of type paths when given a type dictionary.
 --   """
-create_types_list : TypeDictionary -> TypePath.TypePath -> TypePath.TypePath
+create_types_list : TypeDictionary -> TypePath.TypePath -> List TypePath.TypePath
 create_types_list type_dict path = 
     type_dict
     |> Dict.foldr /entry reference_dict -> 
         let
             child_type_path = TypePath.add_child path child_type.name
         in
-
+            if child_type_path = TypePath.fromString child_type_path
+                Dict.merge reference_dict child
+            else
+                reference_dict
+    |> Dict.values
 --   @spec create_types_list(Types.typeDictionary, TypePath.t) :: [TypePath.t]
 --   def create_types_list(type_dict, path) do
 --     type_dict

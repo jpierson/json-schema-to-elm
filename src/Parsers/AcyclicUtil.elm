@@ -10,7 +10,7 @@ import Parsers.ParserResult exposing (..)
 -- import Parsers.ParserError exposing (..)
 
 type alias Parse_child_types = List SchemaNode -> URI -> TypePath -> ParserResult
-type alias Create_types_list = TypeDictionary -> TypePath.TypePath -> TypePath.TypePath
+type alias Create_types_list = TypeDictionary -> TypePath.TypePath -> List TypePath.TypePath
 type alias Create_type_dict = TypeDefinition -> TypePath -> Maybe URI -> TypeDictionary
 
 type alias ParserUtil =

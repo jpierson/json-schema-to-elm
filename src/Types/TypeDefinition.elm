@@ -7,8 +7,8 @@ import Types.ObjectType exposing (ObjectType)
 
 
 type TypeDefinition
-    = AllOfType
-    | ObjectType
+    = AllOfType AllOfType
+    | ObjectType ObjectType
 
 
 

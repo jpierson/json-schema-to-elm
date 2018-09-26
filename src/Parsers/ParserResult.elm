@@ -39,6 +39,19 @@ new =
     , errors = []
     }
 
+newWithTypeDictionary : TypeDictionary -> ParserResult
+newWithTypeDictionary type_dict =
+    { type_dict = Dict.empty
+    , warnings = []
+    , errors = []
+    }
+
+newWithTypeDictionaryAndWarningsAndErrors : TypeDictionary -> List ParserWarning -> List ParserError -> ParserResult
+newWithTypeDictionaryAndWarningsAndErrors type_dict warnings errors =
+    { type_dict = Dict.empty
+    , warnings = warnings
+    , errors = errors
+    }
 
 -- uniq : (a -> a -> bool) -> List a -> List a
 -- uniq comparer list =
