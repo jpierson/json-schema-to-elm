@@ -149,7 +149,7 @@ invalidUri identifier property actual =
 -- of something like `Dict String String` or `Dict String (List String)`
 
 
-unknown_node_type : Types.TypeIdentifier -> String -> Dict.Dict String String -> ParserError
+unknown_node_type : Types.TypeIdentifier -> String -> Types.SchemaNode -> ParserError
 unknown_node_type identifier name schemaNode =
     let
         fullIdentifier =
@@ -159,8 +159,12 @@ unknown_node_type identifier name schemaNode =
                 |> (++) "/"
                 |> (++) name
 
+        -- stringifiedValue =
+        --     sanitize_value (Dict.get "type" schemaNode)
         stringifiedValue =
-            sanitize_value (Dict.get "type" schemaNode)
+            case schemaNode of 
+                Types.Branch branch -> sanitize_value (Dict.get "type" branch) 
+                Types.Leaf leaf -> leaf
 
         error_msg =
             """
@@ -178,3 +182,35 @@ unknown_node_type identifier name schemaNode =
             """
     in
         Parsers.ParserError.new identifier Unknown_node_type error_msg
+
+-- -- HACK: this version of the function was made to resolve difference in how Dict and SchemaNode types
+-- -- are used to represent the tree of values
+-- unknown_node_type2 : Types.TypeIdentifier -> String -> Types.SchemaNode -> ParserError
+-- unknown_node_type2 identifier name schemaNode =
+--     let
+--         fullIdentifier =
+--             identifier
+--                 |> print_identifier
+--                 -- HACK: the Elixir typings here were pretty strange, basically name just needed to be appended
+--                 |> (++) "/"
+--                 |> (++) name
+
+--         stringifiedValue =
+--             sanitize_value (case schemaNode )
+
+--         error_msg =
+--             """
+--             The value of "type" at '""" ++ fullIdentifier ++ """' did not match a known node type
+
+--                 "type": """ ++ stringifiedValue ++ """
+--                         """ ++ error_markings (stringifiedValue) ++ """
+
+--             Was expecting one of the following types
+
+--                 ["null", "boolean", "object", "array", "number", "integer", "string"]
+
+--             Hint: See the specification section 6.25. "Validation keywords - type"
+--             <http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25>
+--             """
+--     in
+--         Parsers.ParserError.new identifier Unknown_node_type error_msg

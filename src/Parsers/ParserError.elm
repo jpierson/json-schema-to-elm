@@ -38,7 +38,7 @@ new identifier error_type message =
     { identifier = identifier
     , error_type = error_type
     , message = message
-    }
+    }   
 
 
 

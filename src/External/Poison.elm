@@ -1,4 +1,4 @@
-module Poison exposing (..)
+module External.Poison exposing (..)
 
 import Dict exposing (..)
 import Json.Decode exposing (..)
