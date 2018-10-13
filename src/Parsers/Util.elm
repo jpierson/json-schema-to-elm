@@ -233,20 +233,29 @@ determine_id schema_node parent_id =
     in
         case id of
             Just id -> 
-                let id_uri = URI.parse id
-                in
-                    Just (
-                        if id_uri.scheme == "urn" then
+                case id of
+                    Leaf s -> 
+                        let id_uri = URI.parse s
+                        in
+                            -- Just (
+                            --     if id_uri.scheme == "urn" then
+                            --         id_uri
+                            --     else
+                            --         URI.merge parent_id id_uri
+                            -- )
                             id_uri
-                        else
-                            URI.merge parent_id id_uri
-                    )
-
+                                |> Maybe.andThen .scheme
+                                |> Maybe.andThen (\scheme -> Just id_uri)
+                                    -- if scheme == "urn" then
+                                    --     id_uri
+                                    -- else
+                                    --     Just URI.merge parent_id id_uri)
+                    _ -> Nothing
             Nothing -> Nothing
 
-
-determine_parent_id : Maybe URI.URI -> URI -> URI
+determine_parent_id : Maybe URI -> URI -> URI
 determine_parent_id id parent_id =
-    case id of
-        Just justId -> if justId.scheme /= "urn" then justId else parent_id
-        Nothing -> parent_id
+    Maybe.andThen .scheme id
+    |> Maybe.andThen (\scheme -> if scheme /= "urn" then id else Nothing)
+    |> Maybe.withDefault parent_id
+    
